@@ -10,6 +10,12 @@ const ControlButton = styled.button`
   background: none;
   border: none;
   cursor: pointer;
+
+  &:hover {
+    path {
+      fill: #ffffff;
+    }
+  }
 `;
 
 const TimeViewer = styled.div`

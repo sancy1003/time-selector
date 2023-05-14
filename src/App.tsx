@@ -10,15 +10,43 @@ const Container = styled.div`
   align-items: center;
 `;
 
+const TimeControllerWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  column-gap: 12px;
+`;
+
 function App() {
-  const [time] = useState(150);
-  const handleTime = () => {
-    return true;
+  const [time, setTime] = useState(515);
+
+  const handleTime = (changeTime: number) => {
+    const maxTime = 1440;
+    const newTime = time + changeTime;
+
+    if (newTime < 0) {
+      setTime(maxTime + newTime);
+    } else if (newTime >= maxTime) {
+      setTime(newTime - maxTime);
+    } else {
+      setTime(newTime);
+    }
   };
 
   return (
     <Container>
-      <TimeController viewerTime={Math.floor(time / 60)} handleUpButton={handleTime} handleDownButton={handleTime} />
+      <TimeControllerWrapper>
+        <TimeController
+          viewerTime={Math.floor(time / 60)}
+          handleUpButton={() => handleTime(60)}
+          handleDownButton={() => handleTime(-60)}
+        />
+        <span>:</span>
+        <TimeController
+          viewerTime={time % 60}
+          handleUpButton={() => handleTime(5)}
+          handleDownButton={() => handleTime(-5)}
+        />
+      </TimeControllerWrapper>
     </Container>
   );
 }
