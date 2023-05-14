@@ -2,12 +2,13 @@ import { styled } from 'styled-components';
 import TimeController from './components/TimeController';
 import { useState } from 'react';
 
-const Container = styled.div`
+const Layout = styled.div`
   width: 100vw;
   height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
+  column-gap: 40px;
 `;
 
 const TimeControllerWrapper = styled.div`
@@ -16,24 +17,32 @@ const TimeControllerWrapper = styled.div`
   column-gap: 12px;
 `;
 
+const TimePeriodViewer = styled.div`
+  width: 32px;
+  font-size: 18px;
+  text-align: center;
+  font-weight: bold;
+`;
+
 function App() {
   const [time, setTime] = useState(515);
 
   const handleTime = (changeTime: number) => {
-    const maxTime = 1440;
+    const MIN_TIME = 0;
+    const MAX_TIME = 1440;
     const newTime = time + changeTime;
 
-    if (newTime < 0) {
-      setTime(maxTime + newTime);
-    } else if (newTime >= maxTime) {
-      setTime(newTime - maxTime);
+    if (newTime < MIN_TIME) {
+      setTime(MAX_TIME + newTime);
+    } else if (newTime >= MAX_TIME) {
+      setTime(newTime - MAX_TIME);
     } else {
       setTime(newTime);
     }
   };
 
   return (
-    <Container>
+    <Layout>
       <TimeControllerWrapper>
         <TimeController
           viewerTime={Math.floor(time / 60)}
@@ -47,7 +56,8 @@ function App() {
           handleDownButton={() => handleTime(-5)}
         />
       </TimeControllerWrapper>
-    </Container>
+      <TimePeriodViewer>{time >= 720 ? 'PM' : 'AM'}</TimePeriodViewer>
+    </Layout>
   );
 }
 
