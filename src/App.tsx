@@ -40,7 +40,7 @@ function App() {
 
   return (
     <Layout>
-      <Clock time={time} />
+      <Clock time={time} setTime={setTime} />
       <TimeControllerWrapper>
         <TimeController
           viewerTime={Math.floor(time / 60)}

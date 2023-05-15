@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { styled } from 'styled-components';
 
 const Container = styled.div``;
@@ -36,28 +36,31 @@ const ClockDot = styled.span`
   border-radius: 50%;
   background: #9999a1;
   z-index: 3;
+  pointer-events: none;
 `;
 
 interface PropsType {
   time: number;
+  setTime: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const CANVAS_WIDTH = 120;
 const CANVAS_HEIGHT = 120;
 
-const Clock = ({ time }: PropsType) => {
+const Clock = ({ time, setTime }: PropsType) => {
+  const [isMouseDown, setIsMouseDown] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const drawClockHnad = (time: number) => {
     const canvas = canvasRef.current as HTMLCanvasElement;
     const context = canvas.getContext('2d') as CanvasRenderingContext2D;
 
-    const length = 3.5; // px
+    const length = 35; // px
     const degree = time * 0.25 - 90;
     const centerX = CANVAS_WIDTH / 2;
     const centerY = CANVAS_HEIGHT / 2;
-    const posX = Math.cos(degree * (Math.PI / 180)) * (length * 10) + centerX;
-    const posY = Math.sin(degree * (Math.PI / 180)) * (length * 10) + centerY;
+    const posX = Math.cos(degree * (Math.PI / 180)) * length + centerX;
+    const posY = Math.sin(degree * (Math.PI / 180)) * length + centerY;
 
     context.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
     context.beginPath();
@@ -69,6 +72,54 @@ const Clock = ({ time }: PropsType) => {
     context.closePath();
   };
 
+  const setTimeByMousePosition = (event: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
+    const canvas = canvasRef.current as HTMLCanvasElement;
+    const canvasRect = canvas.getBoundingClientRect();
+    const posX = event.clientX - canvasRect.left - 60;
+    const posY = event.clientY - canvasRect.top - 60;
+
+    const angle = getAngleByPosition(posX, posY);
+    const newTime = getTimeByAngle(angle);
+
+    setTime(newTime);
+  };
+
+  const getAngleByPosition = (x: number, y: number) => {
+    let angle = 0;
+
+    if (x >= 0) {
+      angle = 90 + Math.atan(y / x) * (180 / Math.PI);
+    } else {
+      angle = 270 + Math.atan(y / x) * (180 / Math.PI);
+    }
+
+    return angle;
+  };
+
+  const getTimeByAngle = (angle: number) => {
+    let time = Math.round(angle / 0.25);
+
+    // 시간을 5분 단위로 나타내기 위해 보정합니다.
+    const unit = 5;
+    if (time % unit <= unit / 2) {
+      time = time - (time % unit);
+    } else {
+      time = time + (unit - (time % unit));
+    }
+
+    return time;
+  };
+
+  const handleMouseDown = (event: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
+    setIsMouseDown(true);
+    setTimeByMousePosition(event);
+  };
+
+  const handleMouseMove = (event: React.MouseEvent<HTMLCanvasElement, MouseEvent>) => {
+    if (!isMouseDown) return;
+    setTimeByMousePosition(event);
+  };
+
   useEffect(() => {
     drawClockHnad(time);
   }, [time]);
@@ -77,7 +128,15 @@ const Clock = ({ time }: PropsType) => {
     <Container>
       <ClockWrapper>
         <ClockDot />
-        <ClockCanvas ref={canvasRef} width={CANVAS_WIDTH} height={CANVAS_HEIGHT} />
+        <ClockCanvas
+          ref={canvasRef}
+          width={CANVAS_WIDTH}
+          height={CANVAS_HEIGHT}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={() => setIsMouseDown(false)}
+          onMouseLeave={() => setIsMouseDown(false)}
+        />
         <ClockImage src="images/clock.svg" alt="clock" />
       </ClockWrapper>
     </Container>
