@@ -31,6 +31,7 @@ src
 ## 프로젝트 실행
 
 ```
+npm i
 npm run start
 ```
 
