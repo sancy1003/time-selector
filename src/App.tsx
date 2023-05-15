@@ -3,6 +3,52 @@ import TimeController from './components/TimeController';
 import { useState } from 'react';
 import Clock from './components/Clock';
 
+const UNIT_OF_TIME = 5; // 분 변경 단위
+
+const App = () => {
+  // 시간을 분 단위로 관리합니다.
+  const [time, setTime] = useState(0);
+
+  const handleTime = (changeTime: number) => {
+    const minTime = 0;
+    const maxTime = 1440;
+
+    const newTime = time + changeTime;
+
+    if (newTime < minTime) {
+      setTime(maxTime + newTime);
+    } else if (newTime >= maxTime) {
+      setTime(newTime - maxTime);
+    } else {
+      setTime(newTime);
+    }
+  };
+
+  return (
+    <Layout>
+      <Clock time={time} setTime={setTime} unitOfTime={UNIT_OF_TIME} />
+      <TimeControllerWrapper>
+        <TimeController
+          viewerTime={Math.floor(time / 60)}
+          handleUpButton={() => handleTime(60)}
+          handleDownButton={() => handleTime(-60)}
+        />
+        <span>:</span>
+        <TimeController
+          viewerTime={time % 60}
+          handleUpButton={() => handleTime(UNIT_OF_TIME)}
+          handleDownButton={() => handleTime(-UNIT_OF_TIME)}
+        />
+      </TimeControllerWrapper>
+      <TimePeriodViewer>{time >= 720 ? 'PM' : 'AM'}</TimePeriodViewer>
+    </Layout>
+  );
+};
+
+export default App;
+
+// style code
+
 const Layout = styled.div`
   width: 100vw;
   height: 100vh;
@@ -24,40 +70,3 @@ const TimePeriodViewer = styled.div`
   text-align: center;
   font-weight: bold;
 `;
-
-function App() {
-  const [time, setTime] = useState(0);
-
-  const handleTime = (changeTime: number) => {
-    const MIN_TIME = 0;
-    const MAX_TIME = 1440;
-
-    const newTime = time + changeTime;
-
-    if (newTime < MIN_TIME) setTime(MAX_TIME + newTime);
-    else if (newTime >= MAX_TIME) setTime(newTime - MAX_TIME);
-    else setTime(newTime);
-  };
-
-  return (
-    <Layout>
-      <Clock time={time} setTime={setTime} />
-      <TimeControllerWrapper>
-        <TimeController
-          viewerTime={Math.floor(time / 60)}
-          handleUpButton={() => handleTime(60)}
-          handleDownButton={() => handleTime(-60)}
-        />
-        <span>:</span>
-        <TimeController
-          viewerTime={time % 60}
-          handleUpButton={() => handleTime(5)}
-          handleDownButton={() => handleTime(-5)}
-        />
-      </TimeControllerWrapper>
-      <TimePeriodViewer>{time >= 720 ? 'PM' : 'AM'}</TimePeriodViewer>
-    </Layout>
-  );
-}
-
-export default App;

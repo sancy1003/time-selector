@@ -1,35 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { styled } from 'styled-components';
 
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  row-gap: 20px;
-`;
-
-const ControlButton = styled.button`
-  background: none;
-  border: none;
-  cursor: pointer;
-
-  &:hover {
-    path {
-      fill: #ffffff;
-    }
-  }
-`;
-
-const TimeViewer = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 70px;
-  height: 42px;
-  color: #ffffff;
-  background: #262c33;
-  border-radius: 8px;
-`;
-
 interface PropsType {
   viewerTime: number;
   handleUpButton: () => void;
@@ -65,6 +36,7 @@ const TimeController = ({ viewerTime, handleUpButton, handleDownButton }: PropsT
     setPressedButton(pressedButton);
   };
 
+  // 사용자가 버튼을 길게 누르면 이벤트가 반복 실행되며 누르고 있는 시간이 길어질수록 이벤트 실행 주기가 빨라집니다.
   const handleInterval = () => {
     if (pressedTime.current > 300) {
       executeButtonEvent(pressedButton);
@@ -113,3 +85,36 @@ const TimeController = ({ viewerTime, handleUpButton, handleDownButton }: PropsT
 };
 
 export default TimeController;
+
+// style code
+
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  row-gap: 20px;
+`;
+
+const ControlButton = styled.button`
+  width: fit-content;
+  background: none;
+  border: none;
+  cursor: pointer;
+
+  &:hover {
+    path {
+      fill: #ffffff;
+    }
+  }
+`;
+
+const TimeViewer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 70px;
+  height: 42px;
+  color: #ffffff;
+  background: #262c33;
+  border-radius: 8px;
+`;
