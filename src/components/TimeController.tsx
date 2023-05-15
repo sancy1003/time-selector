@@ -2,27 +2,48 @@ import { useEffect, useRef, useState } from 'react';
 import { styled } from 'styled-components';
 
 interface PropsType {
-  viewerTime: number;
-  handleUpButton: () => void;
-  handleDownButton: () => void;
+  time: number;
+  type: 'HOUR' | 'MINUTES';
+  unitOfTimeChange: number;
+  setTime: React.Dispatch<React.SetStateAction<number>>;
 }
 
 type PressedButtonType = 'UP' | 'DOWN' | 'NONE';
 
 const DEFAULT_INTERVAL_CYCLE = 200;
 
-const TimeController = ({ viewerTime, handleUpButton, handleDownButton }: PropsType) => {
+const TimeController = ({ time, type, unitOfTimeChange, setTime }: PropsType) => {
   const [pressedButton, setPressedButton] = useState<PressedButtonType>('NONE');
   const pressedTime = useRef(0);
   const intervalCycle = useRef(DEFAULT_INTERVAL_CYCLE);
 
   const formatTime = (time: number) => {
-    return time < 10 ? `0${time}` : `${time}`;
+    let timeByType = 0;
+
+    if (type === 'HOUR') timeByType = Math.floor(time / 60);
+    if (type === 'MINUTES') timeByType = time % 60;
+
+    return timeByType < 10 ? `0${timeByType}` : `${timeByType}`;
+  };
+
+  const handleTime = (changeTime: number) => {
+    const minTime = 0;
+    const maxTime = 1440;
+
+    const newTime = time + changeTime;
+
+    if (newTime < minTime) {
+      setTime(maxTime + newTime);
+    } else if (newTime >= maxTime) {
+      setTime(newTime - maxTime);
+    } else {
+      setTime(newTime);
+    }
   };
 
   const executeButtonEvent = (pressedButton: PressedButtonType) => {
-    if (pressedButton === 'UP') handleUpButton();
-    if (pressedButton === 'DOWN') handleDownButton();
+    if (pressedButton === 'UP') handleTime(unitOfTimeChange);
+    if (pressedButton === 'DOWN') handleTime(-unitOfTimeChange);
   };
 
   const initControllerState = () => {
@@ -51,7 +72,7 @@ const TimeController = ({ viewerTime, handleUpButton, handleDownButton }: PropsT
       const interval = setInterval(handleInterval, intervalCycle.current);
       return () => clearInterval(interval);
     }
-  }, [pressedButton, viewerTime]);
+  }, [pressedButton, time]);
 
   return (
     <Container>
@@ -67,7 +88,7 @@ const TimeController = ({ viewerTime, handleUpButton, handleDownButton }: PropsT
           />
         </svg>
       </ControlButton>
-      <TimeViewer>{formatTime(viewerTime)}</TimeViewer>
+      <TimeViewer>{formatTime(time)}</TimeViewer>
       <ControlButton
         onMouseDown={() => handleMouseDown('DOWN')}
         onMouseUp={initControllerState}

@@ -6,39 +6,16 @@ import Clock from './components/Clock';
 const UNIT_OF_TIME = 5; // 분 변경 단위
 
 const App = () => {
-  // 시간을 분 단위로 관리합니다.
+  // 시간을 분 단위로 관리합니다. (0 ~ 1439)
   const [time, setTime] = useState(0);
-
-  const handleTime = (changeTime: number) => {
-    const minTime = 0;
-    const maxTime = 1440;
-
-    const newTime = time + changeTime;
-
-    if (newTime < minTime) {
-      setTime(maxTime + newTime);
-    } else if (newTime >= maxTime) {
-      setTime(newTime - maxTime);
-    } else {
-      setTime(newTime);
-    }
-  };
 
   return (
     <Layout>
       <Clock time={time} setTime={setTime} unitOfTime={UNIT_OF_TIME} />
       <TimeControllerWrapper>
-        <TimeController
-          viewerTime={Math.floor(time / 60)}
-          handleUpButton={() => handleTime(60)}
-          handleDownButton={() => handleTime(-60)}
-        />
+        <TimeController type="HOUR" time={time} setTime={setTime} unitOfTimeChange={60} />
         <span>:</span>
-        <TimeController
-          viewerTime={time % 60}
-          handleUpButton={() => handleTime(UNIT_OF_TIME)}
-          handleDownButton={() => handleTime(-UNIT_OF_TIME)}
-        />
+        <TimeController type="MINUTES" time={time} setTime={setTime} unitOfTimeChange={UNIT_OF_TIME} />
       </TimeControllerWrapper>
       <TimePeriodViewer>{time >= 720 ? 'PM' : 'AM'}</TimePeriodViewer>
     </Layout>

@@ -64,7 +64,7 @@ const Clock = ({ time, setTime, unitOfTime }: PropsType) => {
   const getTimeByAngle = (degree: number) => {
     let time = Math.round(degree / 0.25);
 
-    // 시간을 5분 단위로 나타내기 위해 보정합니다.
+    // 시간 값을 설정한 단위로 나타내기 위해 보정합니다.
     if (time % unitOfTime <= unitOfTime / 2) {
       time = time - (time % unitOfTime);
     } else {
