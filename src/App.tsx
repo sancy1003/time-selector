@@ -1,6 +1,7 @@
 import { styled } from 'styled-components';
 import TimeController from './components/TimeController';
 import { useState } from 'react';
+import Clock from './components/Clock';
 
 const Layout = styled.div`
   width: 100vw;
@@ -25,24 +26,21 @@ const TimePeriodViewer = styled.div`
 `;
 
 function App() {
-  const [time, setTime] = useState(515);
+  const [time, setTime] = useState(0);
 
   const handleTime = (changeTime: number) => {
     const MIN_TIME = 0;
     const MAX_TIME = 1440;
     const newTime = time + changeTime;
 
-    if (newTime < MIN_TIME) {
-      setTime(MAX_TIME + newTime);
-    } else if (newTime >= MAX_TIME) {
-      setTime(newTime - MAX_TIME);
-    } else {
-      setTime(newTime);
-    }
+    if (newTime < MIN_TIME) setTime(MAX_TIME + newTime);
+    else if (newTime >= MAX_TIME) setTime(newTime - MAX_TIME);
+    else setTime(newTime);
   };
 
   return (
     <Layout>
+      <Clock time={time} />
       <TimeControllerWrapper>
         <TimeController
           viewerTime={Math.floor(time / 60)}
