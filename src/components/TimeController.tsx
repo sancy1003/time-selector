@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react';
 import { styled } from 'styled-components';
 
 const Container = styled.div`
@@ -35,14 +36,58 @@ interface PropsType {
   handleDownButton: () => void;
 }
 
+type PressedButtonType = 'UP' | 'DOWN' | 'NONE';
+
+const DEFAULT_INTERVAL_CYCLE = 200;
+
 const TimeController = ({ viewerTime, handleUpButton, handleDownButton }: PropsType) => {
+  const [pressedButton, setPressedButton] = useState<PressedButtonType>('NONE');
+  const pressedTime = useRef(0);
+  const intervalCycle = useRef(DEFAULT_INTERVAL_CYCLE);
+
   const formatTime = (time: number) => {
     return time < 10 ? `0${time}` : `${time}`;
   };
 
+  const executeButtonEvent = (pressedButton: PressedButtonType) => {
+    if (pressedButton === 'UP') handleUpButton();
+    if (pressedButton === 'DOWN') handleDownButton();
+  };
+
+  const initControllerState = () => {
+    setPressedButton('NONE');
+    pressedTime.current = 0;
+    intervalCycle.current = DEFAULT_INTERVAL_CYCLE;
+  };
+
+  const handleMouseDown = (pressedButton: PressedButtonType) => {
+    executeButtonEvent(pressedButton);
+    setPressedButton(pressedButton);
+  };
+
+  const handleInterval = () => {
+    if (pressedTime.current > 300) {
+      executeButtonEvent(pressedButton);
+    }
+
+    pressedTime.current += intervalCycle.current;
+    if (pressedTime.current > 1000 && intervalCycle.current > 100) intervalCycle.current -= 10;
+  };
+
+  useEffect(() => {
+    if (pressedButton !== 'NONE') {
+      const interval = setInterval(handleInterval, intervalCycle.current);
+      return () => clearInterval(interval);
+    }
+  }, [pressedButton, viewerTime]);
+
   return (
     <Container>
-      <ControlButton onClick={handleUpButton}>
+      <ControlButton
+        onMouseDown={() => handleMouseDown('UP')}
+        onMouseUp={initControllerState}
+        onMouseLeave={initControllerState}
+      >
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path
             d="M11.2929 7.29289C11.6834 6.90237 12.3166 6.90237 12.7071 7.29289L18.7071 13.2929C19.0976 13.6834 19.0976 14.3166 18.7071 14.7071C18.3166 15.0976 17.6834 15.0976 17.2929 14.7071L12 9.41421L6.70711 14.7071C6.31658 15.0976 5.68342 15.0976 5.29289 14.7071C4.90237 14.3166 4.90237 13.6834 5.29289 13.2929L11.2929 7.29289Z"
@@ -51,7 +96,11 @@ const TimeController = ({ viewerTime, handleUpButton, handleDownButton }: PropsT
         </svg>
       </ControlButton>
       <TimeViewer>{formatTime(viewerTime)}</TimeViewer>
-      <ControlButton onClick={handleDownButton}>
+      <ControlButton
+        onMouseDown={() => handleMouseDown('DOWN')}
+        onMouseUp={initControllerState}
+        onMouseLeave={initControllerState}
+      >
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path
             d="M5.29289 9.29289C5.68342 8.90237 6.31658 8.90237 6.70711 9.29289L12 14.5858L17.2929 9.29289C17.6834 8.90237 18.3166 8.90237 18.7071 9.29289C19.0976 9.68342 19.0976 10.3166 18.7071 10.7071L12.7071 16.7071C12.3166 17.0976 11.6834 17.0976 11.2929 16.7071L5.29289 10.7071C4.90237 10.3166 4.90237 9.68342 5.29289 9.29289Z"

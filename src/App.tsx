@@ -31,6 +31,7 @@ function App() {
   const handleTime = (changeTime: number) => {
     const MIN_TIME = 0;
     const MAX_TIME = 1440;
+
     const newTime = time + changeTime;
 
     if (newTime < MIN_TIME) setTime(MAX_TIME + newTime);
